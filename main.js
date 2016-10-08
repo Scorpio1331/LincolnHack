@@ -157,6 +157,7 @@ $(function () {
         obstacle.position.y = -obstacle.getBounds().height;
         obstacle.scale.x = scale;
         obstacle.scale.y = scale;
+        obstacle.hitsLeft = 3;
         stage.addChild(obstacle);
         obstacles.push(obstacle);
         lastObstacle = Date.now();
@@ -211,6 +212,47 @@ $(function () {
           explosion.play();
           stage.addChild(explosion);
           explosions.push(explosion);
+        }
+      }
+
+      for (var i = obstacles.length - 1; i >= 0; i--) {
+        var obstacle = obstacles[i];
+        for (var j = bullets.length - 1; j >= 0; j--) {
+          var bullet = bullets[j];
+
+          if (isIntersecting(obstacle.getBounds(), bullet.getBounds())) {
+            partContainer.removeChild(bullet);
+            bullets.splice(j, 1);
+
+            var explosion = new PIXI.extras.MovieClip(explosionTextures);
+            explosion.anchor.x = 0.5;
+            explosion.anchor.y = 0.5;
+            explosion.position.x = bullet.position.x;
+            explosion.position.y = bullet.position.y;
+            explosion.rotation = Math.random() * Math.PI;
+            explosion.scale.x = 0.25;
+            explosion.scale.y = 0.25;
+            explosion.play();
+            stage.addChild(explosion);
+            explosions.push(explosion);
+
+
+            if (obstacle.hitsLeft <= 0) {
+              stage.removeChild(obstacle);
+              obstacles.splice(i, 1);
+
+              var explosion = new PIXI.extras.MovieClip(explosionTextures);
+              explosion.anchor.x = 0.5;
+              explosion.anchor.y = 0.5;
+              explosion.position.x = obstacle.position.x;
+              explosion.position.y = obstacle.position.y;
+              explosion.rotation = Math.random() * Math.PI;
+              explosion.play();
+              stage.addChild(explosion);
+              explosions.push(explosion);
+            }
+            obstacle.hitsLeft--;
+          }
         }
       }
 
