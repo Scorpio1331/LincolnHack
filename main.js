@@ -15,6 +15,7 @@ $(function () {
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/concrete_texture.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
+  PIXI.loader.add('hillary1', 'images/hillary1.png')
 
   //audio
   PIXI.loader.add({name:"gunFiring", url:"/audio/gun-round.m4a"});
@@ -81,6 +82,11 @@ $(function () {
 
     var bullets = [];
 
+
+    var lastEnemy = Date.now();
+    var enemies = [];
+    var enemyRate = 1500;
+
     // kick off the animation loop (defined below)
     animate();
 
@@ -93,8 +99,6 @@ $(function () {
       // Make the avatar follow the cursor
       avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
-
-
 
       if (isMouseDown) {
         if (firingFrameCount % fireRate == 0) {
@@ -117,14 +121,35 @@ $(function () {
         var obstacle = new PIXI.Text('@RandomUser', {
           fontFamily: 'Black Ops One',
           fontSize: '36px',
-          align: 'center',
-          backgroundColor: 'black'
+          align: 'center'
         });
-        obstacle.position.x = 0;
+        var scale = 200 / obstacle.getBounds().width;
+        obstacle.anchor.x = 0.5;
+        obstacle.position.x = Math.random() * 400 + 100;;
         obstacle.position.y = -obstacle.getBounds().height;
+        obstacle.scale.x = scale;
+        obstacle.scale.y = scale;
         stage.addChild(obstacle);
         obstacles.push(obstacle);
         lastObstacle = Date.now();
+      }
+
+      if (Date.now() - lastEnemy > enemyRate) {
+        var toSpawn = 3 + Math.random() * 3;
+
+        for (var i = 0; i < toSpawn; i++) {
+          var enemy = new PIXI.Sprite(resources.hillary1.texture);
+          enemy.anchor.x = 0.5;
+          enemy.position.y = -enemy.getBounds().height;
+          enemy.position.x = Math.random() * 500 + 50;
+          var scale = 100 / enemy.getBounds().width;
+          enemy.scale.x = scale;
+          enemy.scale.y = scale;
+          stage.addChild(enemy);
+          enemies.push(enemy);
+        }
+
+        lastEnemy = Date.now();
       }
 
       for (var i = bullets.length - 1; i >= 0; i--) {
@@ -165,6 +190,44 @@ $(function () {
         if (explosion.currentFrame == explosion.totalFrames - 1) {
           stage.removeChild(explosion);
           explosions.splice(i, 1);
+        }
+      }
+
+      for (var i = enemies.length - 1; i >= 0; i--) {
+        var enemy = enemies[i];
+        enemy.position.y += 3;
+      }
+
+      for (var i = enemies.length - 1; i >= 0; i--) {
+        var enemy = enemies[i];
+        if (enemy.position.y > window.innerHeight + enemy.getBounds().height) {
+          stage.removeChild(enemy);
+          enemies.splice(i, 1);
+        }
+      }
+
+      for (var i = enemies.length - 1; i >= 0; i--) {
+        var enemy = enemies[i];
+        for (var j = bullets.length - 1; j >= 0; j--) {
+          var bullet = bullets[j];
+
+          if (isIntersecting(bullet, enemy)) {
+            stage.removeChild(enemy);
+            enemies.splice(i, 1);
+
+            partContainer.removeChild(bullet);
+            bullets.splice(j, 1);
+
+            var explosion = new PIXI.extras.MovieClip(explosionTextures);
+            explosion.anchor.x = 0.5;
+            explosion.anchor.y = 0.5;
+            explosion.position.x = enemy.position.x;
+            explosion.position.y = enemy.position.y;
+            explosion.rotation = Math.random() * Math.PI;
+            explosion.play();
+            stage.addChild(explosion);
+            explosions.push(explosion);
+          }
         }
       }
 
