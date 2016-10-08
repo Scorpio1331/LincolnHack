@@ -18,6 +18,9 @@ $(function () {
     // You need to create a root container that will hold the scene you want to draw.
     var stage = new PIXI.Container();
 
+    var backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
+    stage.addChild(backgroundImg);
+
     var partContainer = new PIXI.particles.ParticleContainer(10000, {
       scale: true,
       position: true,
@@ -42,12 +45,6 @@ $(function () {
     // One projectile every 10 frames
     var fireRate = 10;
 
-    var backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
-
-
-
-    stage.addChild(backgroundImg);
-    
     // This creates a texture from a 'bunny.png' image.
     var avatar = new PIXI.Sprite(resources.avatar.texture);
     var bullets = [];
