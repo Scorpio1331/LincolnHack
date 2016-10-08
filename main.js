@@ -1,18 +1,20 @@
-// You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
-// which will try to choose the best renderer for the environment you are in.
-var renderer = new PIXI.WebGLRenderer(800, 600);
+$(function () {
 
-// The renderer will create a canvas element for you that you can then insert into the DOM.
-document.body.appendChild(renderer.view);
+  // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
+  // which will try to choose the best renderer for the environment you are in.
+  var renderer = new PIXI.WebGLRenderer(600, window.innerHeight);
 
-// You need to create a root container that will hold the scene you want to draw.
-var stage = new PIXI.Container();
+  // The renderer will create a canvas element for you that you can then insert into the DOM.
+  document.body.appendChild(renderer.view);
 
-// Declare a global variable for our sprite so that the animate function can access it.
-var bunny = null;
+  // You need to create a root container that will hold the scene you want to draw.
+  var stage = new PIXI.Container();
 
-// load the texture we need
-PIXI.loader.add('bunny', 'bunny.jpg').load(function (loader, resources) {
+  // Declare a global variable for our sprite so that the animate function can access it.
+  var bunny = null;
+
+  // load the texture we need
+  PIXI.loader.add('bunny', 'bunny.jpg').load(function (loader, resources) {
     // This creates a texture from a 'bunny.png' image.
     bunny = new PIXI.Sprite(resources.bunny.texture);
 
@@ -28,9 +30,9 @@ PIXI.loader.add('bunny', 'bunny.jpg').load(function (loader, resources) {
 
     // kick off the animation loop (defined below)
     animate();
-});
+  });
 
-function animate() {
+  function animate() {
     // start the timer for the next animation loop
     requestAnimationFrame(animate);
 
@@ -39,4 +41,6 @@ function animate() {
 
     // this is the main render call that makes pixi draw your container and its children.
     renderer.render(stage);
-}
+  }
+
+});
