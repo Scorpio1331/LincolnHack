@@ -36,14 +36,12 @@ $(function () {
     });
 
     var isMouseDown = false;
-    var frameCount = 0;
+    var firingFrameCount = 0;
+    // One projectile every 10 frames
     var fireRate = 10;
 
-    // Declare a global variable for our sprite so that the animate function can access it.
-    var avatar = null;
-
     // This creates a texture from a 'bunny.png' image.
-    avatar = new PIXI.Sprite(resources.avatar.texture);
+    var avatar = new PIXI.Sprite(resources.avatar.texture);
     var bullets = [];
 
     // Setup the position and scale of the avatar
@@ -61,8 +59,6 @@ $(function () {
     animate();
 
     function animate() {
-      frameCount++;
-
       // start the timer for the next animation loop
       requestAnimationFrame(animate);
 
@@ -71,7 +67,7 @@ $(function () {
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
 
       if (isMouseDown) {
-        if (frameCount % fireRate == 0) {
+        if (firingFrameCount % fireRate == 0) {
           var bullet = new PIXI.Sprite(resources.bullet.texture);
           bullet.scale.x = 0.08;
           bullet.scale.y = 0.08;
@@ -81,6 +77,7 @@ $(function () {
           partContainer.addChild(bullet);
           bullets.push(bullet);
         }
+        firingFrameCount++;
       }
 
       for (var i = bullets.length - 1; i >= 0; i--) {
@@ -98,6 +95,7 @@ $(function () {
     }
 
     $canvas.on('mousedown', function () {
+      firingFrameCount = 0;
       isMouseDown = true;
     });
     $canvas.on('mouseup', function () {
