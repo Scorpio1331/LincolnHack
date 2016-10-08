@@ -20,29 +20,20 @@
            xmlhttp.onreadystatechange = function () {
                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                    data = xmlhttp.responseText;
-                   var tweetDataArray = JSON.parse(data);
-                   //console.log((tweetDataArray))
-
+                   var tweetData = JSON.parse(data);
+                   console.log(tweetData.search_metadata.count)
                    var string = ""
-                   
-
-                   function getTweetDetails(tweet) {
-                    var tweetString = ""
-                    var hashtags = tweet.hashtags.hashtag_text;
-                    var userData = "Alias: " + tweet.username + ", Profile Image URL: " + tweet.user_profile_image_url
-                    var hashtagData = ""
-                    for (var hashtagNum in hashtags) {
-                        hashtagData += "#" + hashtags[hashtagNum] + "\n"
-                    }
-                    tweetString += userData + "\n" + hashtagData + "\n"
-                       
-                       return tweetString
+                   for (var tweetNum in tweetData.statuses) {
+                       var hashtags = tweetData.statuses[tweetNum].entities.hashtags;
+                       var user = tweetData.statuses[tweetNum].user;
+                       var userData = "Name: " + user.name + ", Alias: " + user.screen_name + ", Profile Image URL: " + user.profile_image_url
+                       var hashtagData = ""
+                       for (var hashtagNum in hashtags) {
+                           hashtagData += "#" + hashtags[hashtagNum].text + "\n"
+                       }
+                       string += userData + hashtagData + "\n\n"
                    }
-                   
-                   
-                   document.getElementById("tweets").innerText += tweetDataArray.map((getTweetDetails));
-
-                   
+                   document.getElementById("tweets").innerText = string;
                }
            }
            xmlhttp.send();
