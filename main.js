@@ -36,8 +36,8 @@ $(function () {
     });
 
     var isMouseDown = false;
-    var lastFired = Date.now();
-    var fireRate = 50;
+    var frameCount = 0;
+    var fireRate = 10;
 
     // Declare a global variable for our sprite so that the animate function can access it.
     var avatar = null;
@@ -61,6 +61,8 @@ $(function () {
     animate();
 
     function animate() {
+      frameCount++;
+
       // start the timer for the next animation loop
       requestAnimationFrame(animate);
 
@@ -69,7 +71,7 @@ $(function () {
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
 
       if (isMouseDown) {
-        if (Date.now() - lastFired > fireRate) {
+        if (frameCount % fireRate == 0) {
           var bullet = new PIXI.Sprite(resources.bullet.texture);
           bullet.scale.x = 0.08;
           bullet.scale.y = 0.08;
@@ -78,7 +80,6 @@ $(function () {
           bullet.rotation = Math.PI / 2;
           partContainer.addChild(bullet);
           bullets.push(bullet);
-          lastFired = Date.now();
         }
       }
 
