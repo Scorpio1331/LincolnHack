@@ -14,10 +14,18 @@ $(function () {
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/concrete_texture.jpg');
+  PIXI.loader.add('explosion', 'images/explosion.json')
 
   //audio
   PIXI.loader.add({name:"gunFiring", url:"/audio/gun-round.m4a"});
   PIXI.loader.load(function (loader, resources) {
+
+    var explosionTextures = [];
+
+    for (var i = 0; i < 26; i++) {
+      var texture = PIXI.Texture.fromFrame('Explosion_Sequence_A ' + (i + 1) + '.png');
+      explosionTextures.push(texture);
+    }
 
     // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
     // which will try to choose the best renderer for the environment you are in.
@@ -68,6 +76,8 @@ $(function () {
     var obstacles = [];
     var lastObstacle = Date.now();
     var obstacleRate = 3000;
+
+    var explosions = [];
 
     var bullets = [];
 
@@ -137,7 +147,24 @@ $(function () {
         }
 
         if (isIntersecting(avatar.getBounds(), obstacle.getBounds())) {
-          console.log('intersect');
+          var explosion = new PIXI.extras.MovieClip(explosionTextures);
+          explosion.anchor.x = 0.5;
+          explosion.anchor.y = 0.5;
+          explosion.position.x = avatar.position.x;
+          explosion.position.y = avatar.position.y;
+          explosion.rotation = Math.random() * Math.PI;
+          explosion.play();
+          stage.addChild(explosion);
+          explosions.push(explosion);
+        }
+      }
+
+      for (var i = explosions.length - 1; i >= 0; i--) {
+        var explosion = explosions[i];
+
+        if (explosion.currentFrame == explosion.totalFrames - 1) {
+          stage.removeChild(explosion);
+          explosions.splice(i, 1);
         }
       }
 
