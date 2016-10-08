@@ -24,7 +24,7 @@ $(function () {
   var bunny = null;
 
   // load the texture we need
-  PIXI.loader.add('bunny', 'bunny.jpg').load(function (loader, resources) {
+  PIXI.loader.add('bunny', 'images/bunny.jpg').load(function (loader, resources) {
     // This creates a texture from a 'bunny.png' image.
     bunny = new PIXI.Sprite(resources.bunny.texture);
 
@@ -56,4 +56,24 @@ $(function () {
     renderer.render(stage);
   }
 
+  $canvas.on('mousedown', projectileShoot);
+
+  function projectileShoot() { 
+    console.log('tits');
+  }
+  
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
