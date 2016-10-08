@@ -9,11 +9,14 @@ function isIntersecting(r1, r2) {
 
 $(function () {
 
+  //artwork and img
   PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/concrete_texture.jpg');
 
+  //audio
+  PIXI.loader.add({name:"gunFiring", url:"/audio/gun-round.m4a"});
   PIXI.loader.load(function (loader, resources) {
 
     // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
@@ -93,6 +96,8 @@ $(function () {
           bullet.rotation = Math.PI / 2;
           partContainer.addChild(bullet);
           bullets.push(bullet);
+          var gunFiring = PIXI.audioManager.getAudio('gunFiring');
+          gunFiring.play();
         }
         firingFrameCount++;
       }
