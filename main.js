@@ -8,6 +8,12 @@ function isIntersecting(r1, r2) {
 }
 
 $(function () {
+  // var tweets = [];
+
+  // $.get('http://localhost:1337/gettweets', function (data) {
+  //   console.log(data)
+  //   tweets = data;
+  // });
 
   //artwork and img
   PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
@@ -83,41 +89,40 @@ $(function () {
     var lastObstacle = Date.now();
     var obstacleRate = 3000;
     var explosions = [];
-    var gameSpeed = 4;
+    var gameSpeed = 1;
+    var gameSpeedAcceleration = 0.004;
     var bullets = [];
-
-
 
     var lastEnemy = Date.now();
     var enemies = [];
     var enemyRate = 1500;
 
+    var gameOver = false;
+
     //scoring
-      var score = 1;
-      var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
-      // var scoreBoardBanner = new PIXI.
-      scoreBoard.anchor.x = 0.5;
-      scoreBoard.position.x = 600/2;
-      scoreBoard.position.y = window.innerHeight -50;
-      stage.addChild(scoreBoard);
-
-
+    var score = 1;
+    var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+    // var scoreBoardBanner = new PIXI.
+    scoreBoard.anchor.x = 0.5;
+    scoreBoard.position.x = 600/2;
+    scoreBoard.position.y = window.innerHeight -50;
+    stage.addChild(scoreBoard);
 
     // kick off the animation loop (defined below)
     animate();
 
     function animate() {
       backgroundImg.tilePosition.y += gameSpeed;
+      gameSpeed += gameSpeedAcceleration;
 
       // start the timer for the next animation loop
       requestAnimationFrame(animate);
 
+      if (gameOver) return;
+
       // Make the avatar follow the cursor
       avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
-
-
-
 
       if (isMouseDown) {
         if (firingFrameCount % fireRate == 0) {
@@ -134,6 +139,9 @@ $(function () {
         }
         firingFrameCount++;
       }
+
+      score += gameSpeed;
+      scoreBoard.text = score.toFixed(0);
 
       // Generate a new obstacle every so often
       if (Date.now() - lastObstacle > obstacleRate) {
@@ -183,7 +191,7 @@ $(function () {
 
       for (var i = obstacles.length - 1; i >= 0; i--) {
         var obstacle = obstacles[i];
-        obstacle.position.y += gameSpeed;
+        obstacle.position.y += gameSpeed / 2;
 
         if (obstacle.position.y > window.innerHeight + obstacle.getBounds().height) {
           stage.removeChild(obstacle);
@@ -249,11 +257,26 @@ $(function () {
             explosions.push(explosion);
           }
         }
-      }
 
-      gameSpeed += 0.01;
-      score += gameSpeed;
-      scoreBoard.text = score.toFixed(0); 
+        if (isIntersecting(avatar, enemy)) {
+          gameOver = true;
+
+          stage.removeChild(enemy);
+          enemies.splice(i, 1);
+
+          stage.removeChild(avatar);
+
+          var explosion = new PIXI.extras.MovieClip(explosionTextures);
+          explosion.anchor.x = 0.5;
+          explosion.anchor.y = 0.5;
+          explosion.position.x = avatar.position.x;
+          explosion.position.y = avatar.position.y;
+          explosion.rotation = Math.random() * Math.PI;
+          explosion.play();
+          stage.addChild(explosion);
+          explosions.push(explosion);
+        }
+      }
 
       // this is the main render call that makes pixi draw your container and its children.
       renderer.render(stage);
