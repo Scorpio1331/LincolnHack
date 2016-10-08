@@ -1,13 +1,20 @@
 $(function () {
-  // var tweets = [];
+  var tweets = [];
+  var hashtags = [];
 
-  // $.get('http://localhost:1337/gettweets', function (data) {
-  //   console.log(data)
-  //   tweets = data;
-  // });
+  $.get('http://localhost:1337/gettweets', function (data) {
+    tweets = JSON.parse(data);
+
+    hashtags = tweets.reduce(function (hashtags, tweet) {
+      for (var i in tweet.hashtags.hashtag_text) {
+        hashtags.push(tweet.hashtags.hashtag_text[i]);
+      }
+      return hashtags
+    }, []);
+  });
 
   //artwork and img
-  PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
+  //PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/concrete_texture.jpg');
@@ -15,6 +22,7 @@ $(function () {
   PIXI.loader.add('hillary1', 'images/hillary1.png')
   PIXI.loader.add('hillary2', 'images/hillary2.png')
   PIXI.loader.add('hillary3', 'images/hillary3.png')
+  PIXI.loader.add('trump1', 'images/trump1.png')
 
 
   //audio
@@ -63,15 +71,6 @@ $(function () {
     var backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
     stage.addChild(backgroundImg);
 
-    var partContainer = new PIXI.particles.ParticleContainer(10000, {
-      scale: true,
-      position: true,
-      rotation: true,
-      uvs: true,
-      alpha: true
-    });
-    stage.addChild(partContainer);
-
     var $canvas = $(renderer.view);
     var canvasOffset = $canvas.offset();
 
@@ -85,15 +84,27 @@ $(function () {
     var isMouseDown = false;
     var firingFrameCount = 0;
     // One projectile every 10 frames
-    var fireRate = 10;
+    var fireRate = 4;
 
-    var avatar = new PIXI.Sprite(resources.avatar.texture);
+    var avatar = new PIXI.Sprite(resources.trump1.texture);
     avatar.position.x = 400;
     avatar.position.y = 300;
-    avatar.scale.x = 0.5;
-    avatar.scale.y = 0.5;
-    avatar.rotation = -Math.PI / 2;
+    var scale = 100 / avatar.width;
+    avatar.scale.x = scale;
+    avatar.scale.y = scale;
+    avatar.anchor.x = 0.5;
+    avatar.anchor.y = 0.5;
+    //avatar.rotation = Math.PI;
     stage.addChild(avatar);
+
+    var partContainer = new PIXI.particles.ParticleContainer(10000, {
+      scale: true,
+      position: true,
+      rotation: true,
+      uvs: true,
+      alpha: true
+    });
+    stage.addChild(partContainer);
 
     var obstacles = [];
     var lastObstacle = Date.now();
@@ -138,12 +149,14 @@ $(function () {
       if (gameOver) return;
 
       // Make the avatar follow the cursor
-      avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
-      avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
+      avatar.position.x = cursorPosition.x;// - avatar.getBounds().width / 2 - 20;
+      avatar.position.y = cursorPosition.y;// + avatar.getBounds().height / 2;
 
       if (isMouseDown) {
         if (firingFrameCount % fireRate == 0) {
           var bullet = new PIXI.Sprite(resources.bullet.texture);
+          bullet.anchor.x = 0.5;
+          bullet.anchor.y = 0.5;
           bullet.scale.x = 0.08;
           bullet.scale.y = 0.08;
           bullet.position.x = cursorPosition.x;
@@ -162,7 +175,7 @@ $(function () {
 
       // Generate a new obstacle every so often
       if (Date.now() - lastObstacle > obstacleRate) {
-        var obstacle = new PIXI.Text('@RandomUser', {
+        var obstacle = new PIXI.Text('#' + hashtags[Math.floor(Math.random() * hashtags.length)], {
           fontFamily: 'Black Ops One',
           fontSize: '36px',
           align: 'center'
