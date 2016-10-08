@@ -1,10 +1,11 @@
-﻿var http = require('http');
+var http = require('http');
 var port = process.env.port || 1337;
 var fs = require('fs');
 var url = require('url');
     
 
 http.createServer(function (req, res) {
+console.write("Server started!");
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
