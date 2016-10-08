@@ -10,6 +10,16 @@ $(function () {
   // You need to create a root container that will hold the scene you want to draw.
   var stage = new PIXI.Container();
 
+  var partContainer = new PIXI.particles.ParticleContainer(10000, {
+    scale: true,
+    position: true,
+    rotation: true,
+    uvs: true,
+    alpha: true
+    });
+stage.addChild(partContainer);
+
+
   var $canvas = $(renderer.view);
   var canvasOffset = $canvas.offset();
 
@@ -59,9 +69,13 @@ $(function () {
   $canvas.on('mousedown', projectileShoot);
 
   function projectileShoot() { 
-    console.log('tits');
+
+    for (var i = 0; i < 100; ++i)
+    {
+    var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
+    partContainer.addChild(sprite);
+}
   }
-  
 });
 
 
