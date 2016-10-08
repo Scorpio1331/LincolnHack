@@ -2,6 +2,7 @@ $(function () {
 
   PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
+  PIXI.loader.add('bullet', 'images/bullet.png');
 
   PIXI.loader.load(function (loader, resources) {
 
@@ -39,6 +40,7 @@ $(function () {
 
     // This creates a texture from a 'bunny.png' image.
     avatar = new PIXI.Sprite(resources.avatar.texture);
+    var bullets = [];
 
     // Setup the position and scale of the avatar
     avatar.position.x = 400;
@@ -69,12 +71,23 @@ $(function () {
     $canvas.on('mousedown', projectileShoot);
 
     function projectileShoot() {
-      for (var i = 0; i < 100; ++i) {
-        var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
-        partContainer.addChild(sprite);
-      }
+
+        var bullet = new PIXI.Sprite(resources.bullet.texture);
+        bullet.scale.x = 0.08;       
+        bullet.scale.y = 0.08;
+        bullet.position.x = avatar.position.x
+        bullet.position.y = avatar.position.y
+        bullet.rotation = Math.PI / 2;
+        stage.addChild(bullet);
+        bullets.push(bullet);
+
+      // for (var i = 0; i < 100; ++i) {
+      //   var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
+      //   partContainer.addChild(sprite);
+      // }
     }
   });
+
 });
 
 
