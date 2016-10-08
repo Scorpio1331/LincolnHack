@@ -3,6 +3,7 @@ $(function () {
   PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
+  PIXI.loader.add('background', 'images/concrete_texture.jpg');
 
   PIXI.loader.load(function (loader, resources) {
 
@@ -12,6 +13,7 @@ $(function () {
 
     // The renderer will create a canvas element for you that you can then insert into the DOM.
     document.body.appendChild(renderer.view);
+
 
     // You need to create a root container that will hold the scene you want to draw.
     var stage = new PIXI.Container();
@@ -40,6 +42,12 @@ $(function () {
     // One projectile every 10 frames
     var fireRate = 10;
 
+    var backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
+
+
+
+    stage.addChild(backgroundImg);
+    
     // This creates a texture from a 'bunny.png' image.
     var avatar = new PIXI.Sprite(resources.avatar.texture);
     var bullets = [];
@@ -59,6 +67,8 @@ $(function () {
     animate();
 
     function animate() {
+      backgroundImg.tilePosition.y += 4;
+
       // start the timer for the next animation loop
       requestAnimationFrame(animate);
 
