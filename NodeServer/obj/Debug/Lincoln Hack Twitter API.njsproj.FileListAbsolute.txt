@@ -1,0 +1,2 @@
+c:\users\butte\documents\visual studio 2015\Projects\Lincoln Hack Twitter API\Lincoln Hack Twitter API\obj\Debug\Lincoln Hack Twitter API.njsprojResolveAssemblyReference.cache
+c:\users\butte\documents\visual studio 2015\Projects\Lincoln Hack Twitter API\Lincoln Hack Twitter API\bin\Microsoft.NodejsTools.WebRole.dll

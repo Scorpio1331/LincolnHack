@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Trump tweets</title>
+</head>
+<body>
+<div>
+    <p id="tweets">
+    
+    </p>
+</div>
+
+   <script>
+       
+       function server() {
+           xmlhttp = new XMLHttpRequest();
+           xmlhttp.open("GET", "http://localhost:1337/gettweets", true);
+           xmlhttp.onreadystatechange = function () {
+               if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                   string = xmlhttp.responseText;
+                   document.getElementById("tweets").innerText = string;
+               }
+           }
+           xmlhttp.send();
+       }
+       window.onload = function () {
+           server()
+       }
+   </script>
+
+</body>
+</html>

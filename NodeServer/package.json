@@ -1,0 +1,9 @@
+{
+  "name": "lincoln-hack-twitter-api",
+  "version": "0.0.0",
+  "description": "Lincoln Hack Twitter API",
+  "main": "server.js",
+  "author": {
+    "name": "Butte"
+  }
+}
