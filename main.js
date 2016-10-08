@@ -35,6 +35,10 @@ $(function () {
       cursorPosition.y = e.pageY - canvasOffset.top;
     });
 
+    var isMouseDown = false;
+    var lastFired = Date.now();
+    var fireRate = 50;
+
     // Declare a global variable for our sprite so that the animate function can access it.
     var avatar = null;
 
@@ -64,9 +68,23 @@ $(function () {
       avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
 
+      if (isMouseDown) {
+        if (Date.now() - lastFired > fireRate) {
+          var bullet = new PIXI.Sprite(resources.bullet.texture);
+          bullet.scale.x = 0.08;
+          bullet.scale.y = 0.08;
+          bullet.position.x = cursorPosition.x;
+          bullet.position.y = cursorPosition.y;
+          bullet.rotation = Math.PI / 2;
+          partContainer.addChild(bullet);
+          bullets.push(bullet);
+          lastFired = Date.now();
+        }
+      }
+
       for (var i = bullets.length - 1; i >= 0; i--) {
         var bullet = bullets[i];
-        bullet.position.y -= 5;
+        bullet.position.y -= 10;
 
         if (bullet.position.y < -bullet.getBounds().height) {
           partContainer.removeChild(bullet);
@@ -78,18 +96,12 @@ $(function () {
       renderer.render(stage);
     }
 
-    $canvas.on('mousedown', projectileShoot);
-
-    function projectileShoot() {
-      var bullet = new PIXI.Sprite(resources.bullet.texture);
-      bullet.scale.x = 0.08;
-      bullet.scale.y = 0.08;
-      bullet.position.x = cursorPosition.x;
-      bullet.position.y = cursorPosition.y;
-      bullet.rotation = Math.PI / 2;
-      partContainer.addChild(bullet);
-      bullets.push(bullet);
-    }
+    $canvas.on('mousedown', function () {
+      isMouseDown = true;
+    });
+    $canvas.on('mouseup', function () {
+      isMouseDown = false;
+    });
   });
 
 });
