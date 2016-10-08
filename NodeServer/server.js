@@ -17,25 +17,14 @@ http.createServer(function (req, res) {
 
     var path = url.parse(req.url).pathname;
     if (path == "/gettweets") {
-        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.writeHead(200, { "Content-Type": "text/JSON" });
         //Callback functions
         var error = function (err, res, body) {
-            console.log('ERROR [%s]', err);
+            console.log('ERROR [%s]', err.message);
         };
         var success = function (data) {
-            var tweetData = JSON.parse(data);
-            var string = ""
-            for (var tweetNum in tweetData.statuses) {
-                var hashtags = tweetData.statuses[tweetNum].entities.hashtags;
-                var user = tweetData.statuses[tweetNum].user;
-                var userData = "Name: " + user.name + ", Alias: " + user.screen_name + ", Profile Image URL: " + user.profile_image_url
-                var hashtagData = ""
-                for (var hashtagNum in hashtags) {
-                    hashtagData += "#" + hashtags[hashtagNum].text + "\n"
-                }
-                string += userData + hashtagData + "\n\n"
-            }
-            res.end(string);
+            
+            res.end(data);
         };
 
         var Twitter = require('twitter-node-client').Twitter;
@@ -53,7 +42,7 @@ http.createServer(function (req, res) {
 
         var twitter = new Twitter(config);
 
-        twitter.getSearch({ 'q': '@realDonaldTrump', 'count': 100 }, error, success);
+        twitter.getSearch({ 'q': '@realDonaldTrump','count': 100}, error, success);
         
     } else {
         fs.readFile('./index.html', function (err, file) {

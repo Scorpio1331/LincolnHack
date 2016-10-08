@@ -19,7 +19,20 @@
            xmlhttp.open("GET", "http://localhost:1337/gettweets", true);
            xmlhttp.onreadystatechange = function () {
                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                   string = xmlhttp.responseText;
+                   data = xmlhttp.responseText;
+                   var tweetData = JSON.parse(data);
+                   console.log(tweetData.search_metadata.count)
+                   var string = ""
+                   for (var tweetNum in tweetData.statuses) {
+                       var hashtags = tweetData.statuses[tweetNum].entities.hashtags;
+                       var user = tweetData.statuses[tweetNum].user;
+                       var userData = "Name: " + user.name + ", Alias: " + user.screen_name + ", Profile Image URL: " + user.profile_image_url
+                       var hashtagData = ""
+                       for (var hashtagNum in hashtags) {
+                           hashtagData += "#" + hashtags[hashtagNum].text + "\n"
+                       }
+                       string += userData + hashtagData + "\n\n"
+                   }
                    document.getElementById("tweets").innerText = string;
                }
            }
