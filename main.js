@@ -10,6 +10,16 @@ $(function () {
   // You need to create a root container that will hold the scene you want to draw.
   var stage = new PIXI.Container();
 
+  var $canvas = $(renderer.view);
+  var canvasOffset = $canvas.offset();
+
+  var cursorPosition = { x: 0, y: 0 };
+
+  $canvas.on('mousemove', function (e) {
+    cursorPosition.x = e.pageX - canvasOffset.left;
+    cursorPosition.y = e.pageY - canvasOffset.top;
+  });
+
   // Declare a global variable for our sprite so that the animate function can access it.
   var bunny = null;
 
@@ -37,7 +47,10 @@ $(function () {
     requestAnimationFrame(animate);
 
     // each frame we spin the bunny around a bit
-    bunny.rotation += 0.01;
+    // bunny.rotation += 0.01;
+
+    bunny.position.x = cursorPosition.x;
+    bunny.position.y = cursorPosition.y;
 
     // this is the main render call that makes pixi draw your container and its children.
     renderer.render(stage);
