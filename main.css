@@ -3,7 +3,9 @@ html, body {
   margin: 0;
   display: flex;
   justify-content: center;
+  cursor: none;
 }
 
 canvas {
+
 }

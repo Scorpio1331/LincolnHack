@@ -1,81 +1,80 @@
 $(function () {
 
-  // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
-  // which will try to choose the best renderer for the environment you are in.
-  var renderer = new PIXI.WebGLRenderer(600, window.innerHeight);
+  PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
+  PIXI.loader.add('bunny', 'images/bunny.jpg');
 
-  // The renderer will create a canvas element for you that you can then insert into the DOM.
-  document.body.appendChild(renderer.view);
+  PIXI.loader.load(function (loader, resources) {
 
-  // You need to create a root container that will hold the scene you want to draw.
-  var stage = new PIXI.Container();
+    // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
+    // which will try to choose the best renderer for the environment you are in.
+    var renderer = new PIXI.WebGLRenderer(600, window.innerHeight);
 
-  var partContainer = new PIXI.particles.ParticleContainer(10000, {
-    scale: true,
-    position: true,
-    rotation: true,
-    uvs: true,
-    alpha: true
+    // The renderer will create a canvas element for you that you can then insert into the DOM.
+    document.body.appendChild(renderer.view);
+
+    // You need to create a root container that will hold the scene you want to draw.
+    var stage = new PIXI.Container();
+
+    var partContainer = new PIXI.particles.ParticleContainer(10000, {
+      scale: true,
+      position: true,
+      rotation: true,
+      uvs: true,
+      alpha: true
     });
-stage.addChild(partContainer);
+    stage.addChild(partContainer);
 
+    var $canvas = $(renderer.view);
+    var canvasOffset = $canvas.offset();
 
-  var $canvas = $(renderer.view);
-  var canvasOffset = $canvas.offset();
+    var cursorPosition = { x: 0, y: 0 };
 
-  var cursorPosition = { x: 0, y: 0 };
+    $canvas.on('mousemove', function (e) {
+      cursorPosition.x = e.pageX - canvasOffset.left;
+      cursorPosition.y = e.pageY - canvasOffset.top;
+    });
 
-  $canvas.on('mousemove', function (e) {
-    cursorPosition.x = e.pageX - canvasOffset.left;
-    cursorPosition.y = e.pageY - canvasOffset.top;
-  });
+    // Declare a global variable for our sprite so that the animate function can access it.
+    var avatar = null;
 
-  // Declare a global variable for our sprite so that the animate function can access it.
-  var bunny = null;
-
-  // load the texture we need
-  PIXI.loader.add('bunny', 'images/bunny.jpg').load(function (loader, resources) {
     // This creates a texture from a 'bunny.png' image.
-    bunny = new PIXI.Sprite(resources.bunny.texture);
+    avatar = new PIXI.Sprite(resources.avatar.texture);
 
-    // Setup the position and scale of the bunny
-    bunny.position.x = 400;
-    bunny.position.y = 300;
+    // Setup the position and scale of the avatar
+    avatar.position.x = 400;
+    avatar.position.y = 300;
 
-    bunny.scale.x = 2;
-    bunny.scale.y = 2;
+    avatar.scale.x = 0.5;
+    avatar.scale.y = 0.5;
+    avatar.rotation = -Math.PI / 2;
 
-    // Add the bunny to the scene we are building.
-    stage.addChild(bunny);
+    // Add the avatar to the scene we are building.
+    stage.addChild(avatar);
 
     // kick off the animation loop (defined below)
     animate();
+
+    function animate() {
+      // start the timer for the next animation loop
+      requestAnimationFrame(animate);
+
+      // Make the avatar follow the cursor
+      avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
+      avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
+
+      // this is the main render call that makes pixi draw your container and its children.
+      renderer.render(stage);
+    }
+
+    $canvas.on('mousedown', projectileShoot);
+
+    function projectileShoot() {
+      for (var i = 0; i < 100; ++i) {
+        var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
+        partContainer.addChild(sprite);
+      }
+    }
   });
-
-  function animate() {
-    // start the timer for the next animation loop
-    requestAnimationFrame(animate);
-
-    // each frame we spin the bunny around a bit
-    // bunny.rotation += 0.01;
-
-    bunny.position.x = cursorPosition.x;
-    bunny.position.y = cursorPosition.y;
-
-    // this is the main render call that makes pixi draw your container and its children.
-    renderer.render(stage);
-  }
-
-  $canvas.on('mousedown', projectileShoot);
-
-  function projectileShoot() { 
-
-    for (var i = 0; i < 100; ++i)
-    {
-    var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
-    partContainer.addChild(sprite);
-}
-  }
 });
 
 
