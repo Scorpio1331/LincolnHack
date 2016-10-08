@@ -13,6 +13,9 @@ $(function () {
   PIXI.loader.add('background', 'images/concrete_texture.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
   PIXI.loader.add('hillary1', 'images/hillary1.png')
+  PIXI.loader.add('hillary2', 'images/hillary2.png')
+  PIXI.loader.add('hillary3', 'images/hillary3.png')
+
 
   //audio
   PIXI.loader.add([
@@ -88,17 +91,24 @@ $(function () {
     var enemies = [];
     var enemyRate = 1500;
 
+
     var gameOver = false;
 
     //scoring
-    var score = 1;
-    var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
-    // var scoreBoardBanner = new PIXI.
-    scoreBoard.anchor.x = 0.5;
-    scoreBoard.position.x = 600/2;
-    scoreBoard.position.y = window.innerHeight -50;
-    stage.addChild(scoreBoard);
+      var score = 1;
+      var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+      var scoreBoardBanner = new PIXI.Graphics()
+      // scoreBoardBanner.drawRect(50, 250, 120, 120);
+      // scoreBoardBanner.position.y = ;
+      // scoreBoardBanner.position.x = 200;
+      scoreBoard.anchor.x = 0.5;
+      scoreBoard.position.x = 600/2;
+      scoreBoard.position.y = window.innerHeight -50;
+      stage.addChild(scoreBoard);
+      // stage.addChild(scoreBoardBanner); 
 
+
+console.log(resources)
     // kick off the animation loop (defined below)
     animate();
 
@@ -156,7 +166,7 @@ $(function () {
         var toSpawn = 3 + Math.random() * 3;
 
         for (var i = 0; i < toSpawn; i++) {
-          var enemy = new PIXI.Sprite(resources.hillary1.texture);
+          var enemy = new PIXI.Sprite(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
           enemy.anchor.x = 0.5;
           enemy.position.y = -enemy.getBounds().height;
           enemy.position.x = Math.random() * 500 + 50;
@@ -232,6 +242,8 @@ $(function () {
 
           if (isIntersecting(bullet, enemy)) {
             stage.removeChild(enemy);
+            // var enemyDown = PIXI.audioManager.getAudio('enemyDown');
+            // enemyDown.play();
             enemies.splice(i, 1);
 
             partContainer.removeChild(bullet);
