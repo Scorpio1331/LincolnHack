@@ -6,6 +6,19 @@ html, body {
   cursor: none;
 }
 
-canvas {
+body { 
+	position: relative;
+ }
 
+canvas {
+	z-index: 10;
 }
+/*
+.scoreBoard { 
+	position: absolute;;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #fff;
+	height: 70px;
+ }*/

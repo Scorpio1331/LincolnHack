@@ -18,7 +18,12 @@ $(function () {
   PIXI.loader.add('hillary1', 'images/hillary1.png')
 
   //audio
-  PIXI.loader.add({name:"gunFiring", url:"/audio/gun-round.m4a"});
+  PIXI.loader.add([
+        {name:"gunFiring", url:"/audio/gun-round.m4a"},
+        {name:"enemyDown", url:"/audio/hillary-dead.m4a"}
+        ]);
+
+
   PIXI.loader.load(function (loader, resources) {
 
     var explosionTextures = [];
@@ -77,21 +82,32 @@ $(function () {
     var obstacles = [];
     var lastObstacle = Date.now();
     var obstacleRate = 3000;
-
     var explosions = [];
-
+    var gameSpeed = 4;
     var bullets = [];
+
 
 
     var lastEnemy = Date.now();
     var enemies = [];
     var enemyRate = 1500;
 
+    //scoring
+      var score = 1;
+      var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+      // var scoreBoardBanner = new PIXI.
+      scoreBoard.anchor.x = 0.5;
+      scoreBoard.position.x = 600/2;
+      scoreBoard.position.y = window.innerHeight -50;
+      stage.addChild(scoreBoard);
+
+
+
     // kick off the animation loop (defined below)
     animate();
 
     function animate() {
-      backgroundImg.tilePosition.y += 4;
+      backgroundImg.tilePosition.y += gameSpeed;
 
       // start the timer for the next animation loop
       requestAnimationFrame(animate);
@@ -99,6 +115,9 @@ $(function () {
       // Make the avatar follow the cursor
       avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
+
+
+
 
       if (isMouseDown) {
         if (firingFrameCount % fireRate == 0) {
@@ -164,7 +183,7 @@ $(function () {
 
       for (var i = obstacles.length - 1; i >= 0; i--) {
         var obstacle = obstacles[i];
-        obstacle.position.y += 4;
+        obstacle.position.y += gameSpeed;
 
         if (obstacle.position.y > window.innerHeight + obstacle.getBounds().height) {
           stage.removeChild(obstacle);
@@ -192,6 +211,7 @@ $(function () {
           explosions.splice(i, 1);
         }
       }
+
 
       for (var i = enemies.length - 1; i >= 0; i--) {
         var enemy = enemies[i];
@@ -230,6 +250,10 @@ $(function () {
           }
         }
       }
+
+      gameSpeed += 0.01;
+      score += gameSpeed;
+      scoreBoard.text = score.toFixed(0); 
 
       // this is the main render call that makes pixi draw your container and its children.
       renderer.render(stage);
