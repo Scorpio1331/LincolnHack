@@ -64,6 +64,16 @@ $(function () {
       avatar.position.x = cursorPosition.x - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y + avatar.getBounds().height / 2;
 
+      for (var i = bullets.length - 1; i >= 0; i--) {
+        var bullet = bullets[i];
+        bullet.position.y -= 5;
+
+        if (bullet.position.y < -bullet.getBounds().height) {
+          partContainer.removeChild(bullet);
+          bullets.splice(i, 1);
+        }
+      }
+
       // this is the main render call that makes pixi draw your container and its children.
       renderer.render(stage);
     }
@@ -71,20 +81,14 @@ $(function () {
     $canvas.on('mousedown', projectileShoot);
 
     function projectileShoot() {
-
-        var bullet = new PIXI.Sprite(resources.bullet.texture);
-        bullet.scale.x = 0.08;       
-        bullet.scale.y = 0.08;
-        bullet.position.x = avatar.position.x
-        bullet.position.y = avatar.position.y
-        bullet.rotation = Math.PI / 2;
-        stage.addChild(bullet);
-        bullets.push(bullet);
-
-      // for (var i = 0; i < 100; ++i) {
-      //   var sprite = new PIXI.Sprite.fromImage("images/twatman.jpg");
-      //   partContainer.addChild(sprite);
-      // }
+      var bullet = new PIXI.Sprite(resources.bullet.texture);
+      bullet.scale.x = 0.08;
+      bullet.scale.y = 0.08;
+      bullet.position.x = cursorPosition.x;
+      bullet.position.y = cursorPosition.y;
+      bullet.rotation = Math.PI / 2;
+      partContainer.addChild(bullet);
+      bullets.push(bullet);
     }
   });
 
