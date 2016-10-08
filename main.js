@@ -95,25 +95,25 @@ $(function () {
     var gameOver = false;
 
     //scoring
-      var score = 1;
-      var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
-      var scoreBoardBanner = new PIXI.Graphics()
-      // scoreBoardBanner.drawRect(50, 250, 120, 120);
-      // scoreBoardBanner.position.y = ;
-      // scoreBoardBanner.position.x = 200;
-      scoreBoard.anchor.x = 0.5;
-      scoreBoard.position.x = 600/2;
-      scoreBoard.position.y = window.innerHeight -50;
-      stage.addChild(scoreBoard);
-      // stage.addChild(scoreBoardBanner); 
+    var score = 1;
+    var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+    var scoreBoardBanner = new PIXI.Graphics()
+    // scoreBoardBanner.drawRect(50, 250, 120, 120);
+    // scoreBoardBanner.position.y = ;
+    // scoreBoardBanner.position.x = 200;
+    scoreBoard.anchor.x = 0.5;
+    scoreBoard.position.x = 600/2;
+    scoreBoard.position.y = window.innerHeight -50;
+    stage.addChild(scoreBoard);
+    // stage.addChild(scoreBoardBanner);
 
 
-console.log(resources)
     // kick off the animation loop (defined below)
     animate();
 
     function animate() {
       backgroundImg.tilePosition.y += gameSpeed;
+      enemyRate = Math.max(500, enemyRate - gameSpeed / 10);
       gameSpeed += gameSpeedAcceleration;
 
       // start the timer for the next animation loop
@@ -167,6 +167,8 @@ console.log(resources)
 
         for (var i = 0; i < toSpawn; i++) {
           var enemy = new PIXI.Sprite(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
+          enemy.horizontalVelocity = (Math.random() * 1 - 0.5);
+          enemy.verticalVelocity = Math.min(gameSpeed / 10, 3) + Math.random() * 3;
           enemy.anchor.x = 0.5;
           enemy.position.y = -enemy.getBounds().height;
           enemy.position.x = Math.random() * 500 + 50;
@@ -224,7 +226,8 @@ console.log(resources)
 
       for (var i = enemies.length - 1; i >= 0; i--) {
         var enemy = enemies[i];
-        enemy.position.y += 3;
+        enemy.position.y += enemy.verticalVelocity;
+        enemy.position.x += enemy.horizontalVelocity;
       }
 
       for (var i = enemies.length - 1; i >= 0; i--) {
@@ -240,7 +243,7 @@ console.log(resources)
         for (var j = bullets.length - 1; j >= 0; j--) {
           var bullet = bullets[j];
 
-          if (isIntersecting(bullet, enemy)) {
+          if (isIntersecting(bullet.getBounds(), enemy.getBounds())) {
             stage.removeChild(enemy);
             // var enemyDown = PIXI.audioManager.getAudio('enemyDown');
             // enemyDown.play();
@@ -261,7 +264,7 @@ console.log(resources)
           }
         }
 
-        if (isIntersecting(avatar, enemy)) {
+        if (isIntersecting(avatar.getBounds(), enemy.getBounds())) {
           gameOver = true;
 
           stage.removeChild(enemy);
