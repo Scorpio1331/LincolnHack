@@ -100,7 +100,8 @@ $(function () {
       // Generate a new obstacle every so often
       if (Date.now() - lastObstacle > obstacleRate) {
         var obstacle = new PIXI.Text('@RandomUser', {
-          font: '35px Arial',
+          fontFamily: 'Black Ops One',
+          fontSize: '36px',
           align: 'center',
           backgroundColor: 'black'
         });
@@ -125,7 +126,7 @@ $(function () {
         var obstacle = obstacles[i];
         obstacle.position.y += 4;
 
-        if (obstacle.position.y > window.innerHeiht + obstacle.getBounds().height) {
+        if (obstacle.position.y > window.innerHeight + obstacle.getBounds().height) {
           stage.removeChild(obstacle);
           obstacles.splice(i, 1);
         }
