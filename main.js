@@ -100,11 +100,11 @@ $(function () {
     }
     var avatar, partContainer, isMouseDown, firingFrameCount;
     // One projectile every 10 frames
-<<<<<<< HEAD
+
     var fireRate = 4;
     var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
     var lastEnemy, enemies, enemyRate, gameOver;
-=======
+
     var fireRate = 1;
 
     var avatar = new PIXI.Sprite(resources.trump1.texture);
@@ -149,7 +149,7 @@ $(function () {
     
 
     var gameOver = false;
->>>>>>> origin/master
+
 
     //scoring
     var score, scoreBoardBanner;
@@ -340,17 +340,16 @@ $(function () {
         enemies.push(enemy);
       }
       if (Date.now() - lastEnemy > enemyRate) {
-<<<<<<< HEAD
         var toSpawn = 3 + Math.random() * 3;
         if((Math.floor(Math.random()*3)+1) == 3) {
           var url = tweets[(Math.floor(Math.random()*tweets.length)+1)].user_profile_image_url
           //createEnemy();
           console.log(url);
         };
-=======
+
         var toSpawn = 3 + Math.random() * 7;
 
->>>>>>> origin/master
+
         for (var i = 0; i < toSpawn; i++) {
 
           createEnemy(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
