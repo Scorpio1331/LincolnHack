@@ -17,7 +17,7 @@ $(function () {
   //PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
-  PIXI.loader.add('background', 'images/concrete_texture.jpg');
+  PIXI.loader.add('background', 'images/seamless_wood_floor.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
   PIXI.loader.add('hillary1', 'images/hillary1.png')
   PIXI.loader.add('hillary2', 'images/hillary2.png')
@@ -33,7 +33,8 @@ $(function () {
   PIXI.loader.add([
         {name:"gunFiring", url:"/audio/gun-round.m4a"},
         {name:"enemyDown", url:"/audio/hillary-dead.m4a"},
-        {name:"powerUp", url:"/audio/meat.m4a"}
+        {name:"powerUp", url:"/audio/meat.m4a"},
+        {name:"endGame", url:"/audio/endGame.m4a"}
         ]);
 
 
@@ -106,6 +107,9 @@ $(function () {
     var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
     var lastEnemy, enemies, enemyRate,boss, bossActivated,bossScore, gameOver;
     var powerUps, powerLevel,shield;
+    var endGame;
+
+
     //scoring
     var score,scoreBoard, scoreBoardBanner;
 
@@ -155,6 +159,7 @@ $(function () {
       gameOver = false;
       bossActivated = 0;
       bossScore = 1500000;
+      endGame = PIXI.audioManager.getAudio('endGame');
       score = 1;
       scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
       scoreBoardBanner = new PIXI.Graphics();
@@ -356,6 +361,7 @@ $(function () {
         stage.addChild(enemy);
         enemies.push(enemy);
       }
+
       if (bossActivated !=1 && (Date.now() - lastEnemy > enemyRate)) {
         var toSpawn = 3 + Math.random() * 7;
         for (var i = 0; i < toSpawn; i++) {
@@ -494,6 +500,7 @@ $(function () {
           shield --;
           return;
         }
+        endGame.play('endGame');
         stage.removeChild(avatar);
         //Add text to tell user how to restart
         var resetText = new PIXI.Text("Click to play again", {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
@@ -511,6 +518,7 @@ $(function () {
     $canvas.on('mousedown', function () {
       firingFrameCount = 0;
       if(gameOver) { //On gameover reset game on mousedown
+        endGame.stop();
         setDefaults();
         animate();
       };
