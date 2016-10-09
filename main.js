@@ -1,8 +1,16 @@
 $(function () {
+  $("html").css("cursor","none");
+  $("body").css("cursor","none");
   var tweets = [];
   var hashtags = [];
 //Get tweet data from server
-  $.get('http://localhost:1337/gettweets', function (data) {
+  var url = "";
+  if(hero == "trump"){
+    url = "gethtweets";
+  } else{
+    url = "getdtweets";
+  }
+  $.get('http://localhost:1337/'+url, function (data) {
     tweets = JSON.parse(data);
 
     hashtags = tweets.reduce(function (hashtags, tweet) {
@@ -18,15 +26,21 @@ $(function () {
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/seamless_wood_floor.jpg');
+  PIXI.loader.add('bossBackground', 'images/whitehouse.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
   PIXI.loader.add('hillary1', 'images/hillary1.png')
   PIXI.loader.add('hillary2', 'images/hillary2.png')
   PIXI.loader.add('hillary3', 'images/hillary3.png')
+  PIXI.loader.add('hillary4', 'images/hillary4.png')
   PIXI.loader.add('trump1', 'images/trump1.png')
   PIXI.loader.add('extraBullet', 'images/ourLord.png')
   PIXI.loader.add('shield', 'images/illuminati.png')
   PIXI.loader.add('obama', 'images/obamalaughingface.png')
-
+  PIXI.loader.add('trump2', 'images/trump2.png')
+  PIXI.loader.add('trump3', 'images/trump3.png')
+  PIXI.loader.add('trump4', 'images/trump4.png')
+  PIXI.loader.add('trump5', 'images/trump5.png')
+  PIXI.loader.add('trump6', 'images/trump6.png')
 
 
   //audio
@@ -113,13 +127,18 @@ $(function () {
     //scoring
     var score,scoreBoard, scoreBoardBanner;
 
-    function setLevel(level) {
+    function setLevel(background) {
       for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
-      backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
+      backgroundImg = new PIXI.extras.TilingSprite(resources.bossBackground.texture, 600, window.innerHeight);
       stage.addChild(backgroundImg);
-      stage.addChild(scoreBoard);
+
       stage.addChild(partContainer);
-      avatar = createAvatar(resources.trump1.texture);
+      if(hero == "trump"){
+        avatar = createAvatar(resources.trump1.texture);
+      } else {
+        avatar = createAvatar(resources.hillary4.texture);
+      }
+      stage.addChild(scoreBoard);
     }
     //reset variables to default
     function setDefaults(){
@@ -169,16 +188,17 @@ $(function () {
       scoreBoard.anchor.x = 0.5;
       scoreBoard.position.x = 600/2;
       scoreBoard.position.y = window.innerHeight -50;
-      stage.addChild(scoreBoard);
       // stage.addChild(scoreBoardBanner);
-      setLevel();
+      setLevel(resources.background.texture);
     };
     setDefaults();
     // kick off the animation loop (defined below)
     animate();
 
     function animate() {
+      if(bossActivated != 1) {
       backgroundImg.tilePosition.y += gameSpeed;
+      }
       enemyRate = Math.max(500, enemyRate - gameSpeed / 10);
       gameSpeed += gameSpeedAcceleration;
 
@@ -189,11 +209,11 @@ $(function () {
         requestAnimationFrame(animate);
       }
       //If score reaches 1,500,000 activate boss fight
-      if (score > bossScore && bossActivated == 0){
+      if (score > 1 && bossActivated == 0){
         enemies = [];
         obstacles = [];
         powerUps = [];
-        setLevel();
+        setLevel(resources.bossBackground.texture);
         boss = new PIXI.Sprite(resources.obama.texture);
         boss.horizontalVelocity = 0;
         boss.verticalVelocity =  0.1;
@@ -365,7 +385,11 @@ $(function () {
       if (bossActivated !=1 && (Date.now() - lastEnemy > enemyRate)) {
         var toSpawn = 3 + Math.random() * 7;
         for (var i = 0; i < toSpawn; i++) {
-          createEnemy(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
+          if(hero == "trump"){
+            createEnemy(resources['hillary' + (Math.floor(Math.random() * 4) + 1)].texture);
+          } else {
+            createEnemy(resources['trump' + (Math.floor(Math.random() * 6) + 1)].texture);
+          }
         }
 
         lastEnemy = Date.now();
