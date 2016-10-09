@@ -287,7 +287,7 @@ $(function () {
 
       if (isMouseDown) {
         var adjustedFireRate = powerLevel > 4
-          ? (fireRate - powerLevel + 8)
+          ? (fireRate - powerLevel + 10)
           : (fireRate - powerLevel);
 
         if (firingFrameCount % Math.max(adjustedFireRate, 5) == 0) {
