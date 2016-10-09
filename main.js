@@ -127,15 +127,11 @@ $(function () {
     //scoring
     var score,scoreBoard, scoreBoardBanner;
 
-<<<<<<< Updated upstream
+
     function setLevel(backgroundTexture) {
       for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
       backgroundImg = new PIXI.extras.TilingSprite(backgroundTexture, 600, window.innerHeight);
-=======
-    function setLevel(background) {
-      for (var i = stage.children.length - 1; i >= 0; i--) {    stage.removeChild(stage.children[i]);};
-      backgroundImg = new PIXI.extras.TilingSprite(resources.bossBackground.texture, 600, window.innerHeight);
->>>>>>> Stashed changes
+
       stage.addChild(backgroundImg);
 
       stage.addChild(partContainer);
