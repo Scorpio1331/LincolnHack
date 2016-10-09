@@ -26,6 +26,7 @@ $(function () {
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
   PIXI.loader.add('background', 'images/seamless_wood_floor.jpg');
+  PIXI.loader.add('brickWall', 'images/bricktexture.jpg');
   PIXI.loader.add('bossBackground', 'images/whitehouse.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
   PIXI.loader.add('hillary1', 'images/hillary1.png')
@@ -341,18 +342,25 @@ $(function () {
 
       // Generate a new obstacle every so often
       if (bossActivated != 1 && Date.now() - lastObstacle > obstacleRate) {
-        var obstacle = new PIXI.Text('#' + hashtags[Math.floor(Math.random() * hashtags.length)], {
+        var text = new PIXI.Text('#' + hashtags[Math.floor(Math.random() * hashtags.length)], {
           fontFamily: 'Black Ops One',
           fontSize: '36px',
+          fill: '#fff',
           align: 'center'
         });
-        var scale = 200 / obstacle.getBounds().width;
-        obstacle.anchor.x = 0.5;
-        obstacle.position.x = Math.random() * 400 + 100;;
-        obstacle.position.y = -obstacle.getBounds().height;
-        obstacle.scale.x = scale;
-        obstacle.scale.y = scale;
-        obstacle.hitsLeft = 3;
+        var scale = 300 / text.getBounds().width;
+        text.scale.x = scale;
+        text.scale.y = scale;
+
+        var walls = new PIXI.TilingSprite(resources.brickWall.texture, text.getBounds().width + 50, text.getBounds().height + 10);
+        var obstacle = new PIXI.Container()
+        obstacle.addChild(walls);
+        obstacle.addChild(text);
+        //var scale = 300 / obstacle.getBounds().width;
+        // obstacle.anchor.x = 0.5;
+        obstacle.position.x = Math.random() * 200 + 100;;
+        obstacle.position.y = -obstacle.getBounds().height;        
+        obstacle.hitsLeft = 5;
         stage.addChild(obstacle);
         obstacles.push(obstacle);
         lastObstacle = Date.now();
