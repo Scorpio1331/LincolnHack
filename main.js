@@ -118,7 +118,7 @@ $(function () {
     }
     var avatar, partContainer, isMouseDown, firingFrameCount;
     // One projectile every 10 frames
-    var fireRate = 16;
+    var fireRate = 12;
     var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
     var lastEnemy, enemies, enemyRate,boss, bossActivated,bossScore, gameOver;
     var powerUps, powerLevel, shield, powerUpWeighting;
@@ -156,7 +156,7 @@ $(function () {
       isMouseDown = false;
       firingFrameCount = 0;
       // One projectile every 10 frames
-      fireRate = 16;
+      fireRate = 12;
       partContainer = new PIXI.particles.ParticleContainer(10000, {
         scale: true,
         position: true,
@@ -181,7 +181,7 @@ $(function () {
       shield = 1;
       gameOver = false;
       bossActivated = 0;
-      bossScore = 1500000;
+      bossScore = 1000000;
       endGame = PIXI.audioManager.getAudio('endGame');
       score = 0;
       scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
@@ -241,7 +241,7 @@ $(function () {
         var scale = 300/ boss.getBounds().width;
         boss.scale.x = scale;
         boss.scale.y = scale;
-        boss.hitsLeft = fireRate *111;
+        boss.hitsLeft = fireRate * 75;
         stage.addChild(boss)
         bossActivated = 1;
       }
@@ -251,8 +251,16 @@ $(function () {
           addExplosion(avatar.position);
           loseGame();
         }
+
+        if (Math.random() < 0.05) {
+          var bullet = createBullet({ x: Math.random() * 550, y: 0 }, -Math.PI / 2);
+          bullet.type = 'enemy';
+        }
+
         for (var j = bullets.length - 1; j >= 0; j--) {
           var bullet = bullets[j];
+
+          if (bullet.type == 'enemy') continue;
 
           if (isIntersecting(boss.getBounds(), bullet.getBounds())) {
             partContainer.removeChild(bullet);
@@ -279,7 +287,7 @@ $(function () {
 
       if (isMouseDown) {
         var adjustedFireRate = powerLevel > 4
-          ? (fireRate - powerLevel) * 2
+          ? (fireRate - powerLevel + 8)
           : (fireRate - powerLevel);
 
         if (firingFrameCount % Math.max(adjustedFireRate, 5) == 0) {
@@ -495,7 +503,7 @@ $(function () {
 
             stage.removeChild(enemy);
 
-            powerUpWeighting = powerUpWeighting + 0.15;
+            powerUpWeighting = powerUpWeighting + 0.25;
 
             console.log(powerUpWeighting)
 
