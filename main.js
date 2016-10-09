@@ -178,7 +178,7 @@ $(function () {
       enemyRate = 3000;
       powerLevel = 0;
       powerUpWeighting = 0;
-      shield = 0;
+      shield = 1;
       gameOver = false;
       bossActivated = 0;
       bossScore = 1500000;
@@ -359,7 +359,7 @@ $(function () {
         //var scale = 300 / obstacle.getBounds().width;
         // obstacle.anchor.x = 0.5;
         obstacle.position.x = Math.random() * 200 + 100;;
-        obstacle.position.y = -obstacle.getBounds().height;        
+        obstacle.position.y = -obstacle.getBounds().height;
         obstacle.hitsLeft = 5;
         stage.addChild(obstacle);
         obstacles.push(obstacle);
@@ -495,7 +495,7 @@ $(function () {
 
             stage.removeChild(enemy);
 
-            powerUpWeighting = powerUpWeighting + 0.05;
+            powerUpWeighting = powerUpWeighting + 0.15;
 
             console.log(powerUpWeighting)
 
@@ -545,7 +545,7 @@ $(function () {
         if (bullet.type !== 'enemy') break;
 
         if (isIntersecting(avatar.getBounds(), bullet.getBounds())) {
-          stage.removeChild(bullet);
+          partContainer.removeChild(bullet);
           bullets.splice(i, 1);
           loseGame();
         }
