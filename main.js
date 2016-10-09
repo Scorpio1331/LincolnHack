@@ -127,9 +127,9 @@ $(function () {
     //scoring
     var score,scoreBoard, scoreBoardBanner;
 
-    function setLevel(background) {
+    function setLevel(backgroundTexture) {
       for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
-      backgroundImg = new PIXI.extras.TilingSprite(resources.bossBackground.texture, 600, window.innerHeight);
+      backgroundImg = new PIXI.extras.TilingSprite(backgroundTexture, 600, window.innerHeight);
       stage.addChild(backgroundImg);
 
       stage.addChild(partContainer);
@@ -209,14 +209,14 @@ $(function () {
         requestAnimationFrame(animate);
       }
       //If score reaches 1,500,000 activate boss fight
-      if (score > 1 && bossActivated == 0){
+      if (score > bossScore && bossActivated == 0){
         enemies = [];
         obstacles = [];
         powerUps = [];
         setLevel(resources.bossBackground.texture);
         boss = new PIXI.Sprite(resources.obama.texture);
         boss.horizontalVelocity = 0;
-        boss.verticalVelocity =  0.1;
+        boss.verticalVelocity =  0.3;
         boss.anchor.x = 0.5;
         boss.position.y = -boss.getBounds().height * 3;
         boss.position.x = boss.getBounds().width*2.5;
