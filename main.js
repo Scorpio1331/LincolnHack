@@ -448,7 +448,7 @@ $(function () {
             if (obstacle.hitsLeft <= 0) {
               stage.removeChild(obstacle);
               obstacles.splice(i, 1);
-              score += 300 * gameSpeed
+              score += 300 * gameSpeed;
               addExplosion(obstacle.position);
             }
             obstacle.hitsLeft--;
