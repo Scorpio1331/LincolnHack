@@ -104,23 +104,23 @@ $(function () {
     //Create Avatar
     function createAvatar(spriteTexture){
       var newAvatar =  new PIXI.Sprite(spriteTexture)
-        newAvatar.position.x = 400;
-        newAvatar.position.y = 300;
-        var scale = 100 / newAvatar.width;
-        newAvatar.scale.x = scale;
-        newAvatar.scale.y = scale;
-        newAvatar.anchor.x = 0.5;
-        newAvatar.anchor.y = 0.5;
+      newAvatar.position.x = 400;
+      newAvatar.position.y = 300;
+      var scale = 100 / newAvatar.width;
+      newAvatar.scale.x = scale;
+      newAvatar.scale.y = scale;
+      newAvatar.anchor.x = 0.5;
+      newAvatar.anchor.y = 0.5;
       //avatar.rotation = Math.PI;
       stage.addChild(newAvatar);
       return newAvatar;
     }
     var avatar, partContainer, isMouseDown, firingFrameCount;
     // One projectile every 10 frames
-    var fireRate = 4;
+    var fireRate = 16;
     var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
     var lastEnemy, enemies, enemyRate,boss, bossActivated,bossScore, gameOver;
-    var powerUps, powerLevel,shield;
+    var powerUps, powerLevel, shield, powerUpWeighting;
     var endGame;
 
 
@@ -155,7 +155,7 @@ $(function () {
       isMouseDown = false;
       firingFrameCount = 0;
       // One projectile every 10 frames
-      fireRate = 4;
+      fireRate = 16;
       partContainer = new PIXI.particles.ParticleContainer(10000, {
         scale: true,
         position: true,
@@ -174,14 +174,15 @@ $(function () {
       bullets = [];
       lastEnemy = Date.now();
       enemies = [];
-      enemyRate = 1500;
+      enemyRate = 3000;
       powerLevel = 0;
+      powerUpWeighting = 0;
       shield = 0;
       gameOver = false;
       bossActivated = 0;
       bossScore = 1500000;
       endGame = PIXI.audioManager.getAudio('endGame');
-      score = 1;
+      score = 0;
       scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
       scoreBoardBanner = new PIXI.Graphics();
       // scoreBoardBanner.drawRect(50, 250, 120, 120);
@@ -196,6 +197,20 @@ $(function () {
     setDefaults();
     // kick off the animation loop (defined below)
     animate();
+
+    function createBullet(position, rotation) {
+      var bullet = new PIXI.Sprite(resources.bullet.texture);
+      bullet.anchor.x = 0.5;
+      bullet.anchor.y = 0.5;
+      bullet.scale.x = 0.08;
+      bullet.scale.y = 0.08;
+      bullet.position.x = position.x;
+      bullet.position.y = position.y;
+      bullet.rotation = rotation || Math.PI / 2;
+      partContainer.addChild(bullet);
+      bullets.push(bullet);
+      return bullet;
+    }
 
     function animate() {
       if(bossActivated != 1) {
@@ -262,48 +277,22 @@ $(function () {
       avatar.position.y = cursorPosition.y;// + avatar.getBounds().height / 2;
 
       if (isMouseDown) {
-        if (firingFrameCount % Math.max(fireRate - powerLevel, 5) == 0) {
-          var bullet = new PIXI.Sprite(resources.bullet.texture);
-          bullet.anchor.x = 0.5;
-          bullet.anchor.y = 0.5;
-          bullet.scale.x = 0.08;
-          bullet.scale.y = 0.08;
-          bullet.position.x = cursorPosition.x;
-          bullet.position.y = cursorPosition.y;
-          bullet.rotation = Math.PI / 2;
-          partContainer.addChild(bullet);
-          bullets.push(bullet);
+        var adjustedFireRate = powerLevel > 4
+          ? (fireRate - powerLevel) * 2
+          : (fireRate - powerLevel);
+
+        if (firingFrameCount % Math.max(adjustedFireRate, 5) == 0) {
+          createBullet(cursorPosition);
+
           var gunFiring = PIXI.audioManager.getAudio('gunFiring');
           gunFiring.volume = 0.09;
           gunFiring.play();
 
-            if(powerLevel > 4 && firingFrameCount % (Math.max(fireRate - powerLevel, 5) * 2) == 0) {
-              var bullet = new PIXI.Sprite(resources.bullet.texture);
-              //left bullet
-              bullet.direction = 'left';
-              bullet.anchor.x = 0.5;
-              bullet.anchor.y = 0.5;
-              bullet.scale.x = 0.08;
-              bullet.scale.y = 0.08;
-              bullet.position.x = cursorPosition.x;
-              bullet.position.y = cursorPosition.y;
-              bullet.rotation = (Math.PI / 8) * 3;
-              partContainer.addChild(bullet);
-              bullets.push(bullet);
-
-              //right bullet
-              bullet = new PIXI.Sprite(resources.bullet.texture);
-              bullet.direction = 'right';
-              bullet.rotation = (Math.PI / 4.5) * 3;
-              bullet.anchor.x = 0.5;
-              bullet.anchor.y = 0.5;
-              bullet.scale.x = 0.08;
-              bullet.scale.y = 0.08;
-              bullet.position.x = cursorPosition.x;
-              bullet.position.y = cursorPosition.y;
-              partContainer.addChild(bullet);
-              bullets.push(bullet);
-              fireRate*=4;
+          if(powerLevel > 4) {
+            var bullet = createBullet(cursorPosition, (Math.PI / 8) * 3);
+            bullet.direction = 'left';
+            bullet = createBullet(cursorPosition, (Math.PI / 8) * 5);
+            bullet.direction = 'right';
           }
         }
 
@@ -348,7 +337,6 @@ $(function () {
        }
       }
 
-      score += gameSpeed;
       scoreBoard.text = score.toFixed(0);
 
       // Generate a new obstacle every so often
@@ -397,21 +385,29 @@ $(function () {
         lastEnemy = Date.now();
       };
 
-
-
       for (var i = bullets.length - 1; i >= 0; i--) {
         var bullet = bullets[i];
-        bullet.position.y -= 10;
-        if (bullet.direction == 'left') {
-            bullet.position.x -= 5;
-        }
-        if(bullet.direction == 'right') {
-            bullet.position.x += 5;
-        }
 
-        if (bullet.position.y < -bullet.getBounds().height) {
-          partContainer.removeChild(bullet);
-          bullets.splice(i, 1);
+        if (bullet.type == 'enemy') {
+          bullet.position.y += 5;
+
+          if (bullet.position.y > window.innerHeight + bullet.getBounds().height) {
+            partContainer.removeChild(bullet);
+            bullets.splice(i, 1);
+          }
+        } else {
+          bullet.position.y -= 10;
+          if (bullet.direction == 'left') {
+              bullet.position.x -= 5;
+          }
+          if(bullet.direction == 'right') {
+              bullet.position.x += 5;
+          }
+
+          if (bullet.position.y < -bullet.getBounds().height) {
+            partContainer.removeChild(bullet);
+            bullets.splice(i, 1);
+          }
         }
       }
 
@@ -434,6 +430,8 @@ $(function () {
         var obstacle = obstacles[i];
         for (var j = bullets.length - 1; j >= 0; j--) {
           var bullet = bullets[j];
+
+          if (bullet.type == 'enemy') continue;
 
           if (isIntersecting(obstacle.getBounds(), bullet.getBounds())) {
             partContainer.removeChild(bullet);
@@ -482,23 +480,26 @@ $(function () {
         for (var j = bullets.length - 1; j >= 0; j--) {
           var bullet = bullets[j];
 
+          if (bullet.type == 'enemy') continue;
+
           if (isIntersecting(bullet.getBounds(), enemy.getBounds())) {
             score += 100 * gameSpeed
 
             stage.removeChild(enemy);
-            if((Math.floor(Math.random()*40)+1) == 17) {
-              switch (Math.floor(Math.random()*2)+1) {
-                case 1:
-                  createPowerUp(resources.extraBullet.texture,enemy);
-                  break;
-                case 2:
-                  createPowerUp(resources.shield.texture,enemy);
-                  break;
-                default:
 
+            powerUpWeighting = powerUpWeighting + 0.05;
+
+            console.log(powerUpWeighting)
+
+            if(Math.floor(Math.random()*10*gameSpeed - powerUpWeighting) <= 0) {
+              if (Math.random() < 0.75) {
+                createPowerUp(resources.extraBullet.texture,enemy);
+              } else {
+                createPowerUp(resources.shield.texture,enemy);
               }
-
+              powerUpWeighting = 0;
             }
+
             // var enemyDown = PIXI.audioManager.getAudio('enemyDown');
             // enemyDown.play();
             enemies.splice(i, 1);
@@ -518,9 +519,30 @@ $(function () {
           stage.removeChild(enemy);
           enemies.splice(i, 1);
           loseGame();
-
         }
       }
+
+      for (var i = enemies.length - 1; i >= 0; i--) {
+        var enemy = enemies[i];
+
+        if (Math.random() < 0.001) {
+          var bullet = createBullet(enemy.position, -Math.PI / 2);
+          bullet.type = 'enemy';
+        }
+      }
+
+      for (var i = bullets.length - 1; i >= 0; i--) {
+        var bullet = bullets[i];
+
+        if (bullet.type !== 'enemy') break;
+
+        if (isIntersecting(avatar.getBounds(), bullet.getBounds())) {
+          stage.removeChild(bullet);
+          bullets.splice(i, 1);
+          loseGame();
+        }
+      }
+
       function loseGame(){
         if(shield != 0) {
           shield --;
@@ -542,7 +564,7 @@ $(function () {
     }
 
     $canvas.on('mousedown', function () {
-      firingFrameCount = 0;
+      //firingFrameCount = 0;
       if(gameOver) { //On gameover reset game on mousedown
         endGame.stop();
         setDefaults();
