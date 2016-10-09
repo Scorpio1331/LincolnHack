@@ -17,7 +17,7 @@ $(function () {
   //PIXI.loader.add('avatar', 'images/survivor-idle_rifle_0.png');
   PIXI.loader.add('bunny', 'images/bunny.jpg');
   PIXI.loader.add('bullet', 'images/bullet.png');
-  PIXI.loader.add('background', 'images/concrete_texture.jpg');
+  PIXI.loader.add('background', 'images/seamless_wood_floor.jpg');
   PIXI.loader.add('explosion', 'images/explosion.json')
   PIXI.loader.add('hillary1', 'images/hillary1.png')
   PIXI.loader.add('hillary2', 'images/hillary2.png')
@@ -30,7 +30,8 @@ $(function () {
   PIXI.loader.add([
         {name:"gunFiring", url:"/audio/gun-round.m4a"},
         {name:"enemyDown", url:"/audio/hillary-dead.m4a"},
-        {name:"powerUp", url:"/audio/meat.m4a"}
+        {name:"powerUp", url:"/audio/meat.m4a"},
+        {name:"endGame", url:"/audio/endGame.m4a"}
         ]);
 
 
@@ -458,7 +459,10 @@ $(function () {
         }
 
         if (isIntersecting(avatar.getBounds(), enemy.getBounds())) {
+          var endGame = PIXI.audioManager.getAudio('endGame');
+          endGame.play();
           gameOver = true;
+
 
           stage.removeChild(enemy);
           enemies.splice(i, 1);
