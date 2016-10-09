@@ -25,6 +25,8 @@ $(function () {
   PIXI.loader.add('trump1', 'images/trump1.png')
   PIXI.loader.add('extraBullet', 'images/ourLord.png')
   PIXI.loader.add('shield', 'images/illuminati.png')
+  PIXI.loader.add('obama', 'images/obamalaughingface.png')
+
 
 
   //audio
@@ -102,20 +104,23 @@ $(function () {
     // One projectile every 10 frames
     var fireRate = 4;
     var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
-    var lastEnemy, enemies, enemyRate, gameOver;
+    var lastEnemy, enemies, enemyRate,boss, bossActivated,bossScore, gameOver;
     var powerUps, powerLevel,shield;
     //scoring
-    var score, scoreBoardBanner;
+    var score,scoreBoard, scoreBoardBanner;
 
     function setLevel(level) {
       for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
       backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
       stage.addChild(backgroundImg);
+      stage.addChild(scoreBoard);
+      stage.addChild(partContainer);
+      avatar = createAvatar(resources.trump1.texture);
     }
     //reset variables to default
     function setDefaults(){
       //remove children
-      setLevel();
+
 
       $canvas = $(renderer.view);
       canvasOffset = $canvas.offset();
@@ -145,11 +150,11 @@ $(function () {
       lastEnemy = Date.now();
       enemies = [];
       enemyRate = 1500;
-      powerUprate = 5000;
-      lastPowerUp = Date.now();
       powerLevel = 0;
       shield = 0;
       gameOver = false;
+      bossActivated = 0;
+      bossScore = 1500000;
       score = 1;
       scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
       scoreBoardBanner = new PIXI.Graphics();
@@ -161,6 +166,7 @@ $(function () {
       scoreBoard.position.y = window.innerHeight -50;
       stage.addChild(scoreBoard);
       // stage.addChild(scoreBoardBanner);
+      setLevel();
     };
     setDefaults();
     // kick off the animation loop (defined below)
@@ -177,7 +183,53 @@ $(function () {
       if (!gameOver){
         requestAnimationFrame(animate);
       }
+      //If score reaches 1,500,000 activate boss fight
+      if (score > bossScore && bossActivated == 0){
+        enemies = [];
+        obstacles = [];
+        powerUps = [];
+        setLevel();
+        boss = new PIXI.Sprite(resources.obama.texture);
+        boss.horizontalVelocity = 0;
+        boss.verticalVelocity =  0.1;
+        boss.anchor.x = 0.5;
+        boss.position.y = -boss.getBounds().height * 3;
+        boss.position.x = boss.getBounds().width*2.5;
+        var scale = 300/ boss.getBounds().width;
+        boss.scale.x = scale;
+        boss.scale.y = scale;
+        boss.hitsLeft = fireRate *111;
+        stage.addChild(boss)
+        bossActivated = 1;
+      }
+      if (bossActivated ==1) {
+        boss.position.y += boss.verticalVelocity;
+        if ( (boss.position.y > window.innerHeight ) || (isIntersecting(avatar.getBounds(), boss.getBounds()))) {
+          addExplosion(avatar.position);
+          loseGame();
+        }
+        for (var j = bullets.length - 1; j >= 0; j--) {
+          var bullet = bullets[j];
 
+          if (isIntersecting(boss.getBounds(), bullet.getBounds())) {
+            partContainer.removeChild(bullet);
+            bullets.splice(j, 1);
+
+            addExplosion(bullet.position, 0.25);
+            boss.hitsLeft--;
+
+            if (boss.hitsLeft <= 0) {
+              stage.removeChild(boss);
+              score += 300000 * gameSpeed
+              addExplosion(boss.position);
+              boss = null;
+              bossActivated = 2;
+              bossScore *= 3.66;
+            }
+
+          }
+        }
+      }
       // Make the avatar follow the cursor
       avatar.position.x = cursorPosition.x;// - avatar.getBounds().width / 2 - 20;
       avatar.position.y = cursorPosition.y;// + avatar.getBounds().height / 2;
@@ -231,6 +283,7 @@ $(function () {
         firingFrameCount++;
       }
 
+      //
       function createPowerUp(powerUpTexture,enemy){
         powerUp = new PIXI.Sprite(powerUpTexture);
         powerUp.anchor.x = 0.5;
@@ -265,18 +318,14 @@ $(function () {
           }
           stage.removeChild(powerUp);
           powerUps.splice(i, 1);
-
        }
       }
-
-
-
 
       score += gameSpeed;
       scoreBoard.text = score.toFixed(0);
 
       // Generate a new obstacle every so often
-      if (Date.now() - lastObstacle > obstacleRate) {
+      if (bossActivated != 1 && Date.now() - lastObstacle > obstacleRate) {
         var obstacle = new PIXI.Text('#' + hashtags[Math.floor(Math.random() * hashtags.length)], {
           fontFamily: 'Black Ops One',
           fontSize: '36px',
@@ -307,7 +356,7 @@ $(function () {
         stage.addChild(enemy);
         enemies.push(enemy);
       }
-      if (Date.now() - lastEnemy > enemyRate) {
+      if (bossActivated !=1 && (Date.now() - lastEnemy > enemyRate)) {
         var toSpawn = 3 + Math.random() * 7;
         for (var i = 0; i < toSpawn; i++) {
           createEnemy(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
