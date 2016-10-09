@@ -25,7 +25,20 @@ http.createServer(function (req, res) {
             console.log('ERROR [%s]', err.message);
         };
         var success = function (data) {
+          var tweetData = JSON.parse(data);
+          var JSONstring = []
+          for (var tweetNum in tweetData.statuses) {
+              var hashtags = tweetData.statuses[tweetNum].entities.hashtags;
+              var user = tweetData.statuses[tweetNum].user;
 
+
+              var hashtagData = {"hashtag_text":[]}
+              for (var hashtagNum in hashtags) {
+                  hashtagData["hashtag_text"].push(hashtags[hashtagNum].text)
+              }
+              JSONstring.push({ "username": user.screen_name, "user_profile_image_url": user.profile_image_url, "hashtags": hashtagData })
+          }
+          res.end(JSON.stringify(JSONstring));
             res.end(data); //Send data as response
         };
 

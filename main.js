@@ -1,7 +1,7 @@
 $(function () {
   var tweets = [];
   var hashtags = [];
-
+//Get tweet data from server
   $.get('http://localhost:1337/gettweets', function (data) {
     tweets = JSON.parse(data);
 
@@ -81,60 +81,80 @@ $(function () {
       cursorPosition.y = e.pageY - canvasOffset.top;
     });
 
-    var isMouseDown = false;
-    var firingFrameCount = 0;
+    //Create Avatar
+    function createAvatar(spriteTexture){
+      var newAvatar =  new PIXI.Sprite(spriteTexture)
+        newAvatar.position.x = 400;
+        newAvatar.position.y = 300;
+        var scale = 100 / newAvatar.width;
+        newAvatar.scale.x = scale;
+        newAvatar.scale.y = scale;
+        newAvatar.anchor.x = 0.5;
+        newAvatar.anchor.y = 0.5;
+      //avatar.rotation = Math.PI;
+      stage.addChild(newAvatar);
+      return newAvatar;
+    }
+    var avatar, partContainer, isMouseDown, firingFrameCount;
     // One projectile every 10 frames
     var fireRate = 4;
-
-    var avatar = new PIXI.Sprite(resources.trump1.texture);
-    avatar.position.x = 400;
-    avatar.position.y = 300;
-    var scale = 100 / avatar.width;
-    avatar.scale.x = scale;
-    avatar.scale.y = scale;
-    avatar.anchor.x = 0.5;
-    avatar.anchor.y = 0.5;
-    //avatar.rotation = Math.PI;
-    stage.addChild(avatar);
-
-    var partContainer = new PIXI.particles.ParticleContainer(10000, {
-      scale: true,
-      position: true,
-      rotation: true,
-      uvs: true,
-      alpha: true
-    });
-    stage.addChild(partContainer);
-
-    var obstacles = [];
-    var lastObstacle = Date.now();
-    var obstacleRate = 3000;
-    var explosions = [];
-    var gameSpeed = 1;
-    var gameSpeedAcceleration = 0.004;
-    var bullets = [];
-
-    var lastEnemy = Date.now();
-    var enemies = [];
-    var enemyRate = 1500;
-
-
-    var gameOver = false;
+    var obstacles, lastObstacle, obstacleRate, explosions, gameSpeed, gameSpeedAcceleration, bullets;
+    var lastEnemy, enemies, enemyRate, gameOver;
 
     //scoring
-    var score = 1;
-    var scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
-    var scoreBoardBanner = new PIXI.Graphics()
-    // scoreBoardBanner.drawRect(50, 250, 120, 120);
-    // scoreBoardBanner.position.y = ;
-    // scoreBoardBanner.position.x = 200;
-    scoreBoard.anchor.x = 0.5;
-    scoreBoard.position.x = 600/2;
-    scoreBoard.position.y = window.innerHeight -50;
-    stage.addChild(scoreBoard);
-    // stage.addChild(scoreBoardBanner);
+    var score, scoreBoardBanner;
 
+    function setLevel(level) {
+      for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
+      backgroundImg = new PIXI.extras.TilingSprite(resources.background.texture, 600, window.innerHeight);
+      stage.addChild(backgroundImg);
+    }
+    //reset variables to default
+    function setDefaults(){
+      //remove children
+      setLevel();
 
+      $canvas = $(renderer.view);
+      canvasOffset = $canvas.offset();
+
+      cursorPosition = { x: 0, y: 0 };
+      avatar = createAvatar(resources.trump1.texture);
+      isMouseDown = false;
+      firingFrameCount = 0;
+      // One projectile every 10 frames
+      fireRate = 4;
+      partContainer = new PIXI.particles.ParticleContainer(10000, {
+        scale: true,
+        position: true,
+        rotation: true,
+        uvs: true,
+        alpha: true
+      });
+      stage.addChild(partContainer);
+      obstacles = [];
+      lastObstacle = Date.now();
+      obstacleRate = 3000;
+      explosions = [];
+      gameSpeed = 1;
+      gameSpeedAcceleration = 0.004;
+      bullets = [];
+      lastEnemy = Date.now();
+      enemies = [];
+      enemyRate = 1500;
+      gameOver = false;
+      score = 1;
+      scoreBoard = new PIXI.Text(score, {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+      scoreBoardBanner = new PIXI.Graphics();
+      // scoreBoardBanner.drawRect(50, 250, 120, 120);
+      // scoreBoardBanner.position.y = ;
+      // scoreBoardBanner.position.x = 200;
+      scoreBoard.anchor.x = 0.5;
+      scoreBoard.position.x = 600/2;
+      scoreBoard.position.y = window.innerHeight -50;
+      stage.addChild(scoreBoard);
+      // stage.addChild(scoreBoardBanner);
+    };
+    setDefaults();
     // kick off the animation loop (defined below)
     animate();
 
@@ -144,9 +164,11 @@ $(function () {
       gameSpeed += gameSpeedAcceleration;
 
       // start the timer for the next animation loop
-      requestAnimationFrame(animate);
 
-      if (gameOver) return;
+      //requestAnimationFrame(animate);
+      if (!gameOver){
+        requestAnimationFrame(animate);
+      }
 
       // Make the avatar follow the cursor
       avatar.position.x = cursorPosition.x;// - avatar.getBounds().width / 2 - 20;
@@ -192,21 +214,29 @@ $(function () {
         lastObstacle = Date.now();
       }
 
+      function createEnemy(spriteTexture){
+        var enemy = new PIXI.Sprite(spriteTexture);
+        enemy.horizontalVelocity = (Math.random() * 1 - 0.5);
+        enemy.verticalVelocity = Math.min(gameSpeed / 10, 3) + Math.random() * 3;
+        enemy.anchor.x = 0.5;
+        enemy.position.y = -enemy.getBounds().height;
+        enemy.position.x = Math.random() * 500 + 50;
+        var scale = 100 / enemy.getBounds().width;
+        enemy.scale.x = scale;
+        enemy.scale.y = scale;
+        stage.addChild(enemy);
+        enemies.push(enemy);
+      }
       if (Date.now() - lastEnemy > enemyRate) {
         var toSpawn = 3 + Math.random() * 3;
-
+        if((Math.floor(Math.random()*3)+1) == 3) {
+          var url = tweets[(Math.floor(Math.random()*tweets.length)+1)].user_profile_image_url
+          //createEnemy();
+          console.log(url);
+        };
         for (var i = 0; i < toSpawn; i++) {
-          var enemy = new PIXI.Sprite(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
-          enemy.horizontalVelocity = (Math.random() * 1 - 0.5);
-          enemy.verticalVelocity = Math.min(gameSpeed / 10, 3) + Math.random() * 3;
-          enemy.anchor.x = 0.5;
-          enemy.position.y = -enemy.getBounds().height;
-          enemy.position.x = Math.random() * 500 + 50;
-          var scale = 100 / enemy.getBounds().width;
-          enemy.scale.x = scale;
-          enemy.scale.y = scale;
-          stage.addChild(enemy);
-          enemies.push(enemy);
+
+          createEnemy(resources['hillary' + (Math.floor(Math.random() * 3) + 1)].texture);
         }
 
         lastEnemy = Date.now();
@@ -250,7 +280,7 @@ $(function () {
             if (obstacle.hitsLeft <= 0) {
               stage.removeChild(obstacle);
               obstacles.splice(i, 1);
-
+              score += 300 * gameSpeed
               addExplosion(obstacle.position);
             }
             obstacle.hitsLeft--;
@@ -284,19 +314,22 @@ $(function () {
 
       for (var i = enemies.length - 1; i >= 0; i--) {
         var enemy = enemies[i];
+        //console.log("length: " + enemies.length);
         for (var j = bullets.length - 1; j >= 0; j--) {
           var bullet = bullets[j];
 
           if (isIntersecting(bullet.getBounds(), enemy.getBounds())) {
+            score += 100 * gameSpeed
             stage.removeChild(enemy);
             // var enemyDown = PIXI.audioManager.getAudio('enemyDown');
             // enemyDown.play();
             enemies.splice(i, 1);
-
+            //console.log("enemy removed: " + enemies.length)
             partContainer.removeChild(bullet);
             bullets.splice(j, 1);
 
             addExplosion(enemy.position);
+            break;
           }
         }
 
@@ -307,7 +340,12 @@ $(function () {
           enemies.splice(i, 1);
 
           stage.removeChild(avatar);
-
+          //Add text to tell user how to restart
+          var resetText = new PIXI.Text("Click to play again", {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
+          resetText.anchor.x = 0.5;
+          resetText.position.x = 600/2;
+          resetText.position.y = window.innerHeight/2;
+          stage.addChild(resetText);
           addExplosion(avatar.position);
         }
       }
@@ -318,6 +356,10 @@ $(function () {
 
     $canvas.on('mousedown', function () {
       firingFrameCount = 0;
+      if(gameOver) { //On gameover reset game on mousedown
+        setDefaults();
+        animate();
+      };
       isMouseDown = true;
     });
     $canvas.on('mouseup', function () {
@@ -326,17 +368,3 @@ $(function () {
   });
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
