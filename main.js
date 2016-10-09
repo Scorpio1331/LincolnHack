@@ -556,7 +556,7 @@ $(function () {
           shield --;
           return;
         }
-        endGame.play('endGame');
+        endGame.play();
         stage.removeChild(avatar);
         //Add text to tell user how to restart
         var resetText = new PIXI.Text("Click to play again", {fontFamily : 'Arial', fontSize: 40, fill : 0xff1010, align : 'center'});
@@ -574,7 +574,7 @@ $(function () {
     $canvas.on('mousedown', function () {
       //firingFrameCount = 0;
       if(gameOver) { //On gameover reset game on mousedown
-        endGame.stop();
+        endGame.remove();
         setDefaults();
         animate();
       };
